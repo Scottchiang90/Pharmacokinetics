@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Main</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  <div class="container">
+  <h2>Population Graph #1</h2>
+    
+    <div class="panel panel-primary text-center">
+      <div class="panel-heading">Population Graph</div>
+      <div class="panel-body">
+      
+      <div style="width:100%;">
+            <canvas id="canvas"></canvas>
+          </div>
+          <button id="randomizeData">Randomize Data</button>
+          <button id="addDataset">Add Dataset</button>
+          <button id="removeDataset">Remove Dataset</button>
+          <button id="addData">Add Data</button>
+          <button id="removeData">Remove Data</button>
+
+      </div>
+    </div>
+  
+  <div class="panel panel-primary text-center">
+    <div class="panel-heading">Continuous intravenous infusion of analgesic</div>
+    <div class="panel-body">
+    
+    <p>Mr TCK is a 30 Chinese man who has recently been diagnosed as having an inflammatory arthritis of unknown cause. 
+    While waiting to complete his diagnostic work-up, 
+    you have prescribed a non-steroidal anti-inflammatory drug, 
+    empirically named here T03, to relieve his painful right knee. 
+    Apart from his arthritis, he is clinically well and does not have evidence of liver or kidney disease.</p>
+	
+	<p>T03 is a newly licensed non-steroidal anti-inflammatory drug. 
+	The dose you chose is based on the standard dose recommended by the manufacturer, 75mg twice a day. 
+	It is a relatively well absorbed drug with an average bioavailability of about 90%. 
+	It is primarily cleared by hepatic metabolism,with no active metabolites. 
+	Its plasma elimination half-life is approximately 6-8 hours. 
+	Large scale clinical trials suggest that analgesic effects are on average observable at plasma concentrations exceeding 2.5mg/L, 
+	while anti-inflammatory effects require peak concentrations of at least 5mg/L. 
+	Plasma concentrations greater than 7mg/L may be associated with a higher risk of hepatoxicity.</p>
+    
+    </div>
+  </div>
+
+	</div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/Chart.bundle.js"></script>
+    <script>
+    var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var randomScalingFactor = function() {
+        return Math.ceil(Math.random() * 10.0) * Math.pow(10, Math.ceil(Math.random() * 5));
+    };
+    var randomColorFactor = function() {
+        return Math.round(Math.random() * 255);
+    };
+    var randomColor = function(opacity) {
+        return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',' + (opacity || '.3') + ')';
+    };
+    var config = {
+        type: 'line',
+        data: {
+            labels: ["January", "February", "March", "April", "May", "June", "July"],
+            datasets: [{
+                label: "My First dataset",
+                data: [randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor()],
+                fill: false,
+                borderDash: [5, 5],
+            }, {
+                label: "My Second dataset",
+                data: [randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor()],
+            }]
+        },
+        options: {
+            responsive: true,
+            title:{
+                display:true,
+                text:'Chart.js Line Chart - Logarithmic'
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    gridLines: {
+                        color: ['black', 'red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'x axis'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    type: 'logarithmic',
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'y axis'
+                    }
+                }]
+            }
+        }
+    };
+    $.each(config.data.datasets, function(i, dataset) {
+        dataset.borderColor = randomColor(0.4);
+        dataset.backgroundColor = randomColor(0.5);
+        dataset.pointBorderColor = randomColor(0.7);
+        dataset.pointBackgroundColor = randomColor(0.5);
+        dataset.pointBorderWidth = 1;
+    });
+    window.onload = function() {
+        var ctx = document.getElementById("canvas").getContext("2d");
+        window.myLine = new Chart(ctx, config);
+    };
+    $('#randomizeData').click(function() {
+        $.each(config.data.datasets, function(i, dataset) {
+            dataset.data = dataset.data.map(function() {
+                return randomScalingFactor();
+            });
+        });
+        window.myLine.update();
+    });
+    $('#addDataset').click(function() {
+        var newDataset = {
+            label: 'Dataset ' + config.data.datasets.length,
+            borderColor: randomColor(0.4),
+            backgroundColor: randomColor(0.5),
+            pointBorderColor: randomColor(0.7),
+            pointBackgroundColor: randomColor(0.5),
+            pointBorderWidth: 1,
+            data: [],
+        };
+        for (var index = 0; index < config.data.labels.length; ++index) {
+            newDataset.data.push(randomScalingFactor());
+        }
+        config.data.datasets.push(newDataset);
+        window.myLine.update();
+    });
+    $('#addData').click(function() {
+        if (config.data.datasets.length > 0) {
+            var month = MONTHS[config.data.labels.length % MONTHS.length];
+            config.data.labels.push(month);
+            for (var index = 0; index < config.data.datasets.length; ++index) {
+                config.data.datasets[index].data.push(randomScalingFactor());
+            }
+            window.myLine.update();
+        }
+    });
+    $('#removeDataset').click(function() {
+        config.data.datasets.splice(0, 1);
+        window.myLine.update();
+    });
+    $('#removeData').click(function() {
+        config.data.labels.splice(-1, 1); // remove the label first
+        config.data.datasets.forEach(function(dataset, datasetIndex) {
+            dataset.data.pop();
+        });
+        window.myLine.update();
+    });
+    </script>
+  </body>
+</html>
